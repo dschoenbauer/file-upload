@@ -1,4 +1,6 @@
-# Dot Notation
+# File Upload
+
+A complete PHP upload suite
 
 [![Build Status](https://travis-ci.org/dschoenbauer/file-upload.svg?branch=develop)](https://travis-ci.org/dschoenbauer/file-upload)
 [![Coverage Status](https://coveralls.io/repos/github/dschoenbauer/file-upload/badge.svg?branch=develop)](https://coveralls.io/github/dschoenbauer/file-upload?branch=develop)

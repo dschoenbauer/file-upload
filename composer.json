@@ -1,6 +1,6 @@
 {
     "name": "dschoenbauer/file-upload",
-    "description": "Description of project file-upload.",
+    "description": "A complete PHP upload suite.",
     "authors": [
         {
             "name": "David Schoenbauer",

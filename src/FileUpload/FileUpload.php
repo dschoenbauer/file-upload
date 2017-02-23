@@ -26,7 +26,6 @@
 
 namespace DSchoenbauer\FileUpload;
 
-use DSchoenbauer\Exception\Platform\RuntimeException;
 use finfo;
 
 /**
@@ -40,10 +39,18 @@ class FileUpload {
     private $allowedTypes = [];
     private $allowedFileSize = 0;
 
+    /**
+     * @param array $allowedTypes array of allowed mime types. The key must be the file extention
+     * @param integer $allowedFileSize maximum file size in megabytes
+     */
     public function __construct(array $allowedTypes = [], $allowedFileSize = 0) {
         $this->setAllowedTypes($allowedTypes)->setAllowedFileSize($allowedFileSize);
     }
 
+    /**
+     * Defines which file types are allowed
+     * @return array
+     */
     function getAllowedTypes() {
         return $this->allowedTypes;
     }
@@ -59,7 +66,7 @@ class FileUpload {
     }
 
     /**
-     * 
+     * Provides the maximum allowed file size in megabytes
      * @return integer returns the maximum file size allowed
      */
     public function getAllowedFileSize() {
@@ -67,14 +74,28 @@ class FileUpload {
     }
 
     /**
-     * 
-     * @param integer $allowedFileSize File size in MegaBytes
+     * Provide the maximum allowed file size in megabytes
+     * @param integer $allowedFileSize File size in megabytes
      * @return $this
      */
     public function setAllowedFileSize($allowedFileSize) {
         $this->allowedFileSize = $allowedFileSize * 1024 * 1024;
         return $this;
     }
+    /**
+     * Manages the aspects of the uploading of a file to a server
+     * @param type $fileHandle key of the file that will be found in the $_FILES array
+     * @param string $targetFile path and file name of the file. Extention of original file will be applied to this.
+     * @return string computed path of uploaded file
+     * @throws Exception\InvalidParametersException
+     * @throws Exception\NoFileSentException
+     * @throws Exception\FileTooLargeIniException
+     * @throws Exception\FileTooLargeFormException
+     * @throws Exception\UnknownErrorException
+     * @throws Exception\FileTooLargePhpException
+     * @throws Exception\UnsupportedFileType
+     * @throws Exception\FileFailedToMoveException
+     */
 
     public function handleFile($fileHandle, $targetFile) {
         if (!isset($_FILES[$fileHandle]['error']) || is_array($_FILES[$fileHandle]['error'])) {
