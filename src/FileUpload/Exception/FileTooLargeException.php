@@ -24,40 +24,15 @@
  * THE SOFTWARE.
  */
 
-namespace DSchoenbauer\FileUpload;
+namespace DSchoenbauer\FileUpload\Exception;
+
+use DSchoenbauer\Exception\Http\ClientError\PayloadTooLargeException as FrameworkPayloadTooLargeException;
 
 /**
- * Description of FileUpdateTest
+ * Global file too large exception
  *
  * @author David Schoenbauer <dschoenbauer@gmail.com>
+ * @since 1.0.0
  */
-class FileUpdateTest extends \PHPUnit_Framework_TestCase {
-
-    protected $_object;
-    protected $_types = [];
-
-
-    protected function setUp() {
-        $this->_types = [
-            'jpg' => 'image/jpeg'
-        ];
-        $_FILES = [
-            'fileHandle' => [
-                
-            ]
-        ];
-        $this->_object = new FileUpload();
-    }
-
-    public function testAllowedTypes(){
-        $this->assertEquals($this->_types, $this->_object->setAllowedTypes($this->_types)->getAllowedTypes());
-    }
-    
-    public function testAllowedFileSize(){
-        $this->assertEquals(5 * 1024 * 1024, $this->_object->setAllowedFileSize(5)->getAllowedFileSize());
-    }
-    
-    public function testHandleFileSuccess(){
-        $this->assertEquals('uploads/test.jpg',$this->_object->handleFile('fileHandle', 'uploads/test'));
-    }
+class FileTooLargeException extends FrameworkPayloadTooLargeException implements FileUploadExceptionInterface{
 }

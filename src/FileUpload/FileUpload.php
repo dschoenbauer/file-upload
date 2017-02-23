@@ -26,15 +26,23 @@
 
 namespace DSchoenbauer\FileUpload;
 
+use DSchoenbauer\Exception\Platform\RuntimeException;
+use finfo;
+
 /**
- * Description of FileUpload
+ * One class to manage all PHP file upload needs
  *
  * @author David Schoenbauer <dschoenbauer@gmail.com>
+ * @since 1.0.0
  */
 class FileUpload {
 
     private $allowedTypes = [];
     private $allowedFileSize = 0;
+
+    public function __construct(array $allowedTypes = [], $allowedFileSize = 0) {
+        $this->setAllowedTypes($allowedTypes)->setAllowedFileSize($allowedFileSize);
+    }
 
     function getAllowedTypes() {
         return $this->allowedTypes;
@@ -70,34 +78,37 @@ class FileUpload {
 
     public function handleFile($fileHandle, $targetFile) {
         if (!isset($_FILES[$fileHandle]['error']) || is_array($_FILES[$fileHandle]['error'])) {
-            throw new RuntimeException('Invalid parameters.');
+            throw new Exception\InvalidParametersException();
         }
         switch ($_FILES[$fileHandle]['error']) {
             case UPLOAD_ERR_OK:
                 break;
             case UPLOAD_ERR_NO_FILE:
-                throw new RuntimeException('No file sent.');
+                throw new Exception\NoFileSentException();
             case UPLOAD_ERR_INI_SIZE:
+                throw new Exception\FileTooLargeIniException();
             case UPLOAD_ERR_FORM_SIZE:
-                throw new RuntimeException('Exceeded filesize limit.');
+                throw new Exception\FileTooLargeFormException();
             default:
-                throw new RuntimeException('Unknown errors.');
+                throw new Exception\UnknownErrorException();
         }
 
-        if ($_FILES[$fileHandle]['size'] > $this->getFileSize()) {
-            throw new RuntimeException('Exceeded filesize limit.');
+        if ($_FILES[$fileHandle]['size'] > $this->getAllowedFileSize()) {
+            throw new Exception\FileTooLargePhpException($this->getAllowedFileSize());
         }
 
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         if (false === $ext = array_search(
-                $finfo->file($_FILES[$fileHandle]['tmp_name']), $this->getAllowedFiles(), true
+                $finfo->file($_FILES[$fileHandle]['tmp_name']), $this->getAllowedTypes(), true
                 )) {
-            throw new RuntimeException('Invalid file format.');
+            throw new Exception\UnsupportedFileType(array_keys($this->getAllowedTypes()));
         }
 
         $targetFile .= "." . $ext;
+        //var_dump($_FILES[$fileHandle]['tmp_name'], $targetFile, dirname($targetFile),is_writable(dirname($targetFile)));
+
         if (!move_uploaded_file($_FILES[$fileHandle]['tmp_name'], $targetFile)) {
-            throw new RuntimeException('Failed to move uploaded file.');
+            throw new Exception\FileFailedToMoveException();
         }
         return $targetFile;
     }
